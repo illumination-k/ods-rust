@@ -1,5 +1,6 @@
-use std::iter::repeat_with;
+use crate::array::allocate_heap;
 use std::ops::{Index, IndexMut};
+
 #[derive(Debug, Default)]
 pub struct ArrayStack<T> {
     a: Box<[T]>,
@@ -12,35 +13,20 @@ where
 {
     pub fn new(n: usize) -> Self {
         Self {
-            a: Self::allocate(n),
+            a: allocate_heap(n),
             n: 0,
         }
     }
-    pub fn allocate(n: usize) -> Box<[T]> {
-        repeat_with(|| T::default())
-            .take(n)
-            .collect::<Vec<T>>()
-            .into_boxed_slice()
-    }
 
-    // 配列長
-    pub fn len(&self) -> usize {
-        self.a.len()
-    }
-
+    /// 内部要素の数が多すぎたとき、少なすぎたときにメモリ上に確保する配列長を変更する
     pub fn resize(&mut self) {
-        let new_length = std::cmp::max(self.len() * 2, 1);
-        let mut b = Self::allocate(new_length);
-        for i in 0..self.len() {
+        let new_length = std::cmp::max(self.size() * 2, 1);
+        let mut b = allocate_heap(new_length);
+        for i in 0..self.size() {
             b[i] = self[i].clone();
         }
 
         let _old_a = std::mem::replace(&mut self.a, b);
-    }
-
-    // 内部要素の数
-    pub fn size(&self) -> usize {
-        self.n
     }
 
     pub fn add(&mut self, i: usize, x: T) {
@@ -60,18 +46,41 @@ where
         self.n += 1;
     }
 
-    pub fn remove(&mut self, i: usize) {
+    pub fn remove(&mut self, i: usize) -> T {
+        let x = self.a[i].clone();
         let n = self.size();
         if i < n {
+            // rotate leftでずらす
             self.a[i..n].rotate_left(1);
             self.n -= 1;
+
+            // defaultでn番目を埋めたほうがいい？実装上はまあ必要ない
 
             if self.len() >= 3 * n {
                 self.resize();
             }
         }
+        x
     }
 }
+
+impl<T> ArrayStack<T> {
+    /// 配列長
+    pub fn len(&self) -> usize {
+        self.a.len()
+    }
+    /// 内部要素の数
+    pub fn size(&self) -> usize {
+        self.n
+    }
+
+    pub fn size_mut(&mut self) -> &mut usize {
+        &mut self.n
+    }
+}
+
+// get and setの実装はIndexで十分かな
+// assert index < self.size()があったほうがいい可能性
 
 impl<T> Index<usize> for ArrayStack<T> {
     type Output = T;
