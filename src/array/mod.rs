@@ -1,6 +1,7 @@
 pub mod deque;
 pub mod dual_array_deque;
 pub mod queue;
+pub mod rootish_array_stack;
 pub mod stack;
 
 pub fn allocate_heap<T: Default>(n: usize) -> Box<[T]> {

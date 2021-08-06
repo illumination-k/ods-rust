@@ -14,13 +14,13 @@ impl<T> DualArrayDeque<T>
 where
     T: Clone + Default,
 {
-    fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             front: ArrayStack::new(0),
             back: ArrayStack::new(0),
         }
     }
-    fn add(&mut self, i: usize, x: T) {
+    pub fn add(&mut self, i: usize, x: T) {
         let f_n = self.front.size();
         if i < f_n {
             self.front.add(f_n - i, x);
@@ -31,7 +31,7 @@ where
         self.balance();
     }
 
-    fn remove(&mut self, i: usize) -> T {
+    pub fn remove(&mut self, i: usize) -> T {
         let f_n = self.front.size();
         let x = if i < f_n {
             self.front.remove(f_n - i - 1)

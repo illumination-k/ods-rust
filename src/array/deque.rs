@@ -1,8 +1,8 @@
 use crate::array::allocate_heap;
 use std::ops::{Index, IndexMut};
 
-#[derive(Debug)]
-struct ArrayDeque<T> {
+#[derive(Debug, Clone)]
+pub struct ArrayDeque<T> {
     a: Box<[T]>,
     n: usize,
     j: usize,
