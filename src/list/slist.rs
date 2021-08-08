@@ -84,7 +84,7 @@ mod test_sllist {
         sllist.push('a');
         sllist.push('b');
         sllist.add('c');
-
+        dbg!(&sllist);
         assert_eq!(sllist.pop(), Some('b'));
         assert_eq!(sllist.pop(), Some('a'));
         assert_eq!(sllist.pop(), Some('c'));
