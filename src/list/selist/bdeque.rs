@@ -2,6 +2,7 @@ use std::ops::{Index, IndexMut};
 
 use crate::array::allocate_heap;
 
+#[derive(Debug, Clone)]
 pub struct BDeque<T> {
     a: Box<[T]>,
     n: usize,
@@ -20,7 +21,7 @@ where
         }
     }
 
-    pub fn add(&mut self, x: T, index: usize) {
+    pub fn add(&mut self, index: usize, x: T) {
         let n = self.size();
 
         if index < n / 2 {
@@ -34,7 +35,8 @@ where
                 self.a[self.mod_index(k)] = self.a[self.mod_index(k + 1)].clone();
             }
         } else {
-            for k in (index + 1..n).rev() {
+            for k in (index + 1..=n).rev() {
+                dbg!(&self.mod_index(k));
                 self.a[self.mod_index(k)] = self.a[self.mod_index(k - 1)].clone();
             }
         }
@@ -60,6 +62,10 @@ where
 
         x
     }
+
+    pub fn push_back(&mut self, x: T) {
+        self.add(self.size(), x)
+    }
 }
 
 impl<T> BDeque<T> {
@@ -82,5 +88,25 @@ impl<T> Index<usize> for BDeque<T> {
 impl<T> IndexMut<usize> for BDeque<T> {
     fn index_mut(&mut self, index: usize) -> &mut Self::Output {
         &mut self.a[self.mod_index(index)]
+    }
+}
+
+#[cfg(test)]
+mod test_array_bq {
+    use super::*;
+
+    #[test]
+    fn test_array_dequeue_1() {
+        let mut dq = BDeque::new(10);
+        for c in "abcdef".chars() {
+            dq.add(0, c);
+        }
+        dbg!(&dq);
+
+        for c in "abcdef".chars().rev() {
+            let x = dq.remove(0);
+            dbg!(&x);
+            assert_eq!(x, c);
+        }
     }
 }

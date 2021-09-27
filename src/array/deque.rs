@@ -51,7 +51,7 @@ where
             }
         } else {
             // 要素数の中央より大きいとき、右寄せa[i] - a[n]
-            for k in (i + 1..self.n).rev() {
+            for k in (i + 1..=self.n).rev() {
                 self.a[self.mod_index(k)] = self.a[self.mod_index(k - 1)].clone();
             }
         }
